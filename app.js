@@ -76,7 +76,7 @@
 
     const body = $("#cart-items");
     if (!cart.length) {
-      body.innerHTML = '<div class="empty"><em>Osso empty.</em>Your bag is waiting for its first ring.</div>';
+      body.innerHTML = '<div class="empty"><em>Osso empty.</em>Your softer shower starts with one ring.</div>';
     } else {
       body.innerHTML = cart.map((l, idx) => `
         <div class="line">
@@ -323,7 +323,7 @@
       return;
     }
     msg.classList.remove("err");
-    msg.textContent = "You're on the list. Osso glad you're here.";
+    msg.textContent = "Check your inbox. Your guide is on its way.";
     $("#nl-email").value = "";
   });
 

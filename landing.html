@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Osso Waitlist</title>
+<meta name="description" content="Osso is an in-shower water softener for renters. Join the waitlist and help shape it.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,200..700&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<style>
+/* Layout concept: one-screen waitlist. Photo and promise on one side, a single focused card on the other;
+   the card steps through a short survey after signup. Same warm stone palette as the main site. */
+:root {
+  --paper: #F1EBE3; --paper-2: #E6DDD1; --card: #F8F4EE;
+  --ink: #241D18; --ink-2: #6E6158; --line: rgba(36, 29, 24, 0.14);
+  --accent: #8A6440; --nickel: #B39272;
+  --deep: #1A1410; --deep-fg: #F2EADF; --deep-dim: #A69684; --deep-line: rgba(242,234,223,.14);
+  --ok: #4F6B45; --err: #A8452C;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --sans: "Geist", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Geist Mono", ui-monospace, Menlo, monospace;
+  --serif: "Instrument Serif", "Times New Roman", serif;
+  --ease: cubic-bezier(.2,.7,.1,1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15110E; --paper-2: #1E1814; --card: #1A1511;
+    --ink: #F0E8DD; --ink-2: #A99A8A; --line: rgba(240,232,221,.13);
+    --accent: #D9AE7C; --nickel: #C9AA88;
+    --deep: #0C0907; --deep-fg: #F0E8DD; --deep-dim: #A08F7E; --deep-line: rgba(240,232,221,.12);
+    --ok: #9DBB8F; --err: #E08A6E;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15110E; --paper-2: #1E1814; --card: #1A1511;
+  --ink: #F0E8DD; --ink-2: #A99A8A; --line: rgba(240,232,221,.13);
+  --accent: #D9AE7C; --nickel: #C9AA88;
+  --deep: #0C0907; --deep-fg: #F0E8DD; --deep-dim: #A08F7E; --deep-line: rgba(240,232,221,.12);
+  --ok: #9DBB8F; --err: #E08A6E;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; display: block; height: auto; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+em { font-family: var(--serif); font-style: italic; font-weight: 400; }
+.mono { font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; }
+.muted { color: var(--ink-2); }
+.wrap { max-width: 1240px; margin-inline: auto; padding-inline: clamp(16px, 4vw, 48px); }
+
+.top { display: flex; justify-content: space-between; align-items: center; padding-block: 22px; }
+.wordmark { font-family: var(--display); font-stretch: 125%; font-size: 26px; letter-spacing: -0.02em; margin: 0; line-height: 1; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 72px); align-items: start; padding-block: clamp(12px, 3vw, 40px) clamp(48px, 6vw, 88px); }
+.pitch { min-width: 0; display: flex; flex-direction: column; gap: 22px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin: 0; display: flex; align-items: center; gap: 10px; }
+.eyebrow::before { content: ""; width: 18px; height: 1px; background: currentColor; }
+h1 { font-family: var(--display); font-stretch: 118%; font-weight: 250; font-size: clamp(2.6rem, 6vw, 5rem); line-height: .98; letter-spacing: -0.04em; margin: 0; text-wrap: balance; }
+h1 em { color: var(--accent); font-size: 1.06em; letter-spacing: -0.01em; }
+.lede { font-size: clamp(1.05rem, 1.4vw, 1.18rem); color: var(--ink-2); max-width: 46ch; margin: 0; }
+.photo { margin: 0; position: relative; }
+.photo img { width: 100%; aspect-ratio: 16 / 11; object-fit: cover; object-position: 50% 28%; }
+.points { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.points li { padding: 14px 14px 0 0; font-size: 14px; color: var(--ink-2); min-width: 0; }
+.points li + li { padding-left: 14px; border-left: 1px solid var(--line); }
+.points b { display: block; color: var(--ink); font-family: var(--display); font-stretch: 112%; font-weight: 400; font-size: 1.05rem; margin-bottom: 2px; }
+
+/* Card */
+.card { background: var(--card); border: 1px solid var(--line); padding: clamp(22px, 3.4vw, 40px); display: flex; flex-direction: column; gap: 22px; min-width: 0; position: sticky; top: 20px; }
+.card h2 { font-family: var(--display); font-stretch: 115%; font-weight: 300; font-size: clamp(1.6rem, 2.6vw, 2.1rem); line-height: 1.08; letter-spacing: -0.025em; margin: 0; text-wrap: balance; }
+.card h2 em { color: var(--accent); }
+.card p { margin: 0; }
+.progress { display: flex; gap: 6px; }
+.progress span { flex: 1; height: 3px; background: var(--line); transition: background .3s; }
+.progress span.on { background: var(--ink); }
+.step-meta { display: flex; justify-content: space-between; color: var(--ink-2); }
+.field { display: flex; flex-direction: column; gap: 10px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.field > label, .field > legend { font-family: var(--display); font-stretch: 108%; font-size: 1.05rem; padding: 0; margin-bottom: 2px; }
+.field .hint { font-size: 13px; color: var(--ink-2); margin-top: -6px; }
+input[type="email"], input[type="text"], textarea {
+  font: 400 17px/1.4 var(--sans); color: var(--ink); background: transparent; width: 100%;
+  border: 0; border-bottom: 1px solid var(--line); padding: 10px 0; border-radius: 0;
+}
+textarea { border: 1px solid var(--line); padding: 12px; min-height: 96px; resize: vertical; font-size: 15px; }
+input:focus, textarea:focus { outline: none; border-color: var(--ink); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { position: relative; cursor: pointer; }
+.chip input { position: absolute; opacity: 0; inset: 0; cursor: pointer; margin: 0; }
+.chip span { display: inline-block; padding: 10px 15px; border: 1px solid var(--line); border-radius: 999px; font-size: 14px; transition: background .2s, color .2s, border-color .2s; }
+.chip:hover span { border-color: var(--ink-2); }
+.chip input:checked + span { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.scale { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.scale .chip span { width: 100%; text-align: center; padding-inline: 0; font-variant-numeric: tabular-nums; }
+.scale-ends { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--ink-2); }
+.stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; width: max-content; }
+.stepper button { width: 44px; height: 44px; border: 0; background: transparent; font-size: 20px; color: var(--ink); cursor: pointer; border-radius: 999px; }
+.stepper output { min-width: 48px; text-align: center; font: 300 22px/1 var(--display); font-stretch: 115%; font-variant-numeric: tabular-nums; }
+.zip { max-width: 180px; font-variant-numeric: tabular-nums; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: 500 14.5px/1 var(--sans); padding: 16px 24px; border-radius: 999px; border: 1px solid transparent; cursor: pointer; text-decoration: none; transition: background .25s, color .25s, border-color .25s, transform .2s var(--ease); }
+.btn:active { transform: scale(.98); }
+.btn-ink { background: var(--ink); color: var(--paper); }
+.btn-ink:hover { background: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--ink); }
+.btn-text { background: none; border: 0; color: var(--ink-2); padding: 12px 4px; font: 400 14px/1 var(--sans); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.row.between { justify-content: space-between; }
+.msg { font-size: 13.5px; min-height: 1.2em; color: var(--ink-2); }
+.msg.err { color: var(--err); }
+.fine { font-size: 12.5px; color: var(--ink-2); }
+.notice { font-size: 13px; padding: 10px 12px; border: 1px dashed var(--line); color: var(--ink-2); }
+.reserve-box { border: 1px solid var(--line); padding: 16px; display: flex; flex-direction: column; gap: 8px; background: var(--paper); }
+.reserve-box b { font-family: var(--display); font-stretch: 112%; font-weight: 400; font-size: 1.1rem; }
+.done-mark { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--ok); color: var(--ok); display: grid; place-items: center; font-size: 20px; }
+.copybox { display: flex; gap: 8px; align-items: center; }
+.copybox code { flex: 1; min-width: 0; font: 400 13px/1.4 var(--mono); padding: 10px 12px; border: 1px solid var(--line); overflow-x: auto; white-space: nowrap; user-select: all; }
+
+/* Owner results */
+.results { background: var(--deep); color: var(--deep-fg); padding-block: clamp(48px, 6vw, 80px); }
+.results h2 { font-family: var(--display); font-stretch: 115%; font-weight: 300; font-size: clamp(1.8rem, 3vw, 2.4rem); letter-spacing: -0.02em; margin: 0; }
+.results .eyebrow { color: var(--deep-dim); }
+.results .muted, .results .fine { color: var(--deep-dim); }
+.r-head { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 12px; margin-bottom: 28px; }
+.kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--deep-line); border-bottom: 1px solid var(--deep-line); }
+.kpi { padding: 18px 16px 18px 0; min-width: 0; }
+.kpi + .kpi { padding-left: 16px; border-left: 1px solid var(--deep-line); }
+.kpi .v { display: block; font-family: var(--display); font-stretch: 120%; font-weight: 250; font-size: clamp(1.8rem, 3.2vw, 2.6rem); line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+.kpi .k { color: var(--deep-dim); font-size: 10.5px; margin-top: 8px; display: block; }
+.r-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 40px; margin-top: 32px; }
+.tally { min-width: 0; }
+.tally h3 { font: 400 11px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--deep-dim); margin: 0 0 8px; }
+.tally table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tally td { padding: 7px 0; border-bottom: 1px solid var(--deep-line); }
+.tally td:last-child { text-align: right; color: var(--deep-dim); white-space: nowrap; padding-left: 12px; }
+.tally td:last-child b { color: var(--deep-fg); font-weight: 500; margin-right: 6px; }
+.wide { grid-column: 1 / -1; }
+.table-scroll { overflow-x: auto; }
+.people { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 13.5px; }
+.people th { text-align: left; font: 400 10.5px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--deep-dim); padding: 8px 12px 8px 0; border-bottom: 1px solid var(--deep-line); }
+.people td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--deep-line); vertical-align: top; }
+.people td.q { max-width: 380px; color: var(--deep-fg); }
+.results .btn-ghost { color: var(--deep-fg); border-color: var(--deep-line); }
+.results .btn-ghost:hover { border-color: var(--deep-fg); }
+
+footer { padding-block: 28px; border-top: 1px solid var(--line); }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .card { position: static; }
+  .hero { display: flex; flex-direction: column; }
+  .pitch { display: contents; }
+  .pitch .eyebrow { order: 1; } .pitch h1 { order: 2; } .pitch .lede { order: 3; }
+  .card { order: 4; } .photo { order: 5; } .points { order: 6; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .kpi { border-bottom: 1px solid var(--deep-line); }
+  .r-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .points { grid-template-columns: minmax(0, 1fr); }
+  .points li + li { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); padding-block: 12px; }
+  .row .btn { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap top">
+  <p class="wordmark">osso</p>
+  <span class="mono muted">Launching 2027</span>
+</div>
+
+<main class="wrap hero">
+  <section class="pitch">
+    <p class="eyebrow">The in-shower water softener</p>
+    <h1 id="headline">Soft water. <em>No landlord required.</em></h1>
+    <p class="lede" id="lede">Osso threads onto the shower you already have and softens your water at the one place you feel it most. No plumber, no tank, no deposit at risk. We're building it now, and we'd like your help.</p>
+    <figure class="photo">
+      <img src="assets/shower.webp" alt="The Osso ring, a polished nickel loop, mounted on a marble shower wall with water falling through it." width="1825" height="2000">
+    </figure>
+    <ul class="points">
+      <li><b>3-minute install</b>By hand, between your shower arm and head.</li>
+      <li><b>Monthly pods</b>Resin pods ship on your schedule.</li>
+      <li><b>Moves with you</b>Unthread it and take it to your next place.</li>
+    </ul>
+  </section>
+
+  <section class="card" aria-live="polite">
+    <p class="notice" id="store-notice" hidden>Responses can't be saved in this view. Open the page signed in to claude.ai to take part.</p>
+
+    <!-- Step: join -->
+    <form id="s-join" novalidate>
+      <div class="field" style="gap:22px">
+        <h2>Be first in line for <em>osso soft.</em></h2>
+        <p class="muted">Join the waitlist for launch pricing and early access. It takes 10 seconds.</p>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+        </div>
+        <fieldset class="field">
+          <legend>Do you rent or own your home?</legend>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="home" value="rent"><span>I rent</span></label>
+            <label class="chip"><input type="radio" name="home" value="own"><span>I own</span></label>
+            <label class="chip"><input type="radio" name="home" value="other"><span>Something else</span></label>
+          </div>
+        </fieldset>
+        <div class="row">
+          <button class="btn btn-ink" type="submit">Join the waitlist</button>
+        </div>
+        <div class="reserve-box">
+          <b>Ready now? Reserve yours for $129.</b>
+          <span class="fine">Includes the Osso Ring and your first month of pods. Fully refundable until it ships.</span>
+          <div><button class="btn btn-ghost" type="button" id="reserve">Reserve for $129</button></div>
+        </div>
+        <p class="msg" id="join-msg"></p>
+      </div>
+    </form>
+
+    <!-- Step: reserved (fake door) -->
+    <div id="s-reserved" hidden>
+      <div class="field" style="gap:18px">
+        <div class="done-mark" aria-hidden="true">✓</div>
+        <h2>You're early. <em>We love that.</em></h2>
+        <p class="muted">Reservations aren't open yet, so we haven't charged anything. We've marked you as a reservation and you'll be first to get the $129 launch price.</p>
+        <div class="row"><button class="btn btn-ink" type="button" id="to-survey-1">Help shape Osso · 90 seconds</button></div>
+      </div>
+    </div>
+
+    <!-- Survey -->
+    <form id="s-survey" novalidate hidden>
+      <div class="field" style="gap:22px">
+        <div class="step-meta"><span class="mono" id="step-label">Question 1 of 5</span><span class="mono">About 90 seconds</span></div>
+        <div class="progress" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+
+        <div class="q" data-q="1">
+          <fieldset class="field">
+            <legend>How much does hard water bother you today?</legend>
+            <div class="scale chips">
+              <label class="chip"><input type="radio" name="bother" value="1"><span>1</span></label>
+              <label class="chip"><input type="radio" name="bother" value="2"><span>2</span></label>
+              <label class="chip"><input type="radio" name="bother" value="3"><span>3</span></label>
+              <label class="chip"><input type="radio" name="bother" value="4"><span>4</span></label>
+              <label class="chip"><input type="radio" name="bother" value="5"><span>5</span></label>
+            </div>
+            <div class="scale-ends"><span>Not at all</span><span>It drives me up the wall</span></div>
+          </fieldset>
+          <fieldset class="field" style="margin-top:22px">
+            <legend>What do you notice most?</legend>
+            <p class="hint">Pick any.</p>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" name="pains" value="hair"><span>Dull or dry hair</span></label>
+              <label class="chip"><input type="checkbox" name="pains" value="color"><span>Hair color fading</span></label>
+              <label class="chip"><input type="checkbox" name="pains" value="skin"><span>Dry or itchy skin</span></label>
+              <label class="chip"><input type="checkbox" name="pains" value="glass"><span>Spots on glass</span></label>
+              <label class="chip"><input type="checkbox" name="pains" value="scale"><span>Scale on fixtures</span></label>
+              <label class="chip"><input type="checkbox" name="pains" value="chlorine"><span>Chlorine smell</span></label>
+              <label class="chip"><input type="checkbox" name="pains" value="unsure"><span>Not sure my water is hard</span></label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="q" data-q="2" hidden>
+          <fieldset class="field">
+            <legend>What have you tried?</legend>
+            <p class="hint">Pick any.</p>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" name="tried" value="filterhead"><span>Filter showerhead</span></label>
+              <label class="chip"><input type="checkbox" name="tried" value="clarifying"><span>Clarifying shampoo</span></label>
+              <label class="chip"><input type="checkbox" name="tried" value="treatments"><span>Hair or skin treatments</span></label>
+              <label class="chip"><input type="checkbox" name="tried" value="cleaners"><span>Descalers and glass cleaners</span></label>
+              <label class="chip"><input type="checkbox" name="tried" value="wholehome"><span>Whole-home softener</span></label>
+              <label class="chip"><input type="checkbox" name="tried" value="nothing"><span>Nothing yet</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="field" style="margin-top:22px">
+            <legend>Roughly what do you spend a month on those?</legend>
+            <div class="chips">
+              <label class="chip"><input type="radio" name="spend" value="0"><span>$0</span></label>
+              <label class="chip"><input type="radio" name="spend" value="1-15"><span>Under $15</span></label>
+              <label class="chip"><input type="radio" name="spend" value="15-40"><span>$15–$40</span></label>
+              <label class="chip"><input type="radio" name="spend" value="40+"><span>More than $40</span></label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="q" data-q="3" hidden>
+          <div class="field">
+            <label for="showers-out">Showers a week in the shower you'd put Osso on</label>
+            <p class="hint">Count everyone who uses it.</p>
+            <div class="stepper">
+              <button type="button" data-step="-1" aria-label="Fewer showers">−</button>
+              <output id="showers-out">7</output>
+              <button type="button" data-step="1" aria-label="More showers">+</button>
+            </div>
+          </div>
+          <div class="field" style="margin-top:22px">
+            <label for="zip">ZIP code</label>
+            <p class="hint">So we can estimate how hard your water is.</p>
+            <input id="zip" class="zip" type="text" inputmode="numeric" maxlength="5" autocomplete="postal-code" placeholder="e.g. 85004">
+          </div>
+        </div>
+
+        <div class="q" data-q="4" hidden>
+          <fieldset class="field">
+            <legend>The starter kit is the Osso Ring plus a month of pods. What price feels right?</legend>
+            <div class="chips">
+              <label class="chip"><input type="radio" name="price" value="<79"><span>Under $79</span></label>
+              <label class="chip"><input type="radio" name="price" value="79-99"><span>$79–$99</span></label>
+              <label class="chip"><input type="radio" name="price" value="99-129"><span>$99–$129</span></label>
+              <label class="chip"><input type="radio" name="price" value="129-159"><span>$129–$159</span></label>
+              <label class="chip"><input type="radio" name="price" value="159+"><span>$159+ if it works</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="field" style="margin-top:22px">
+            <legend>Pods would cost about $12 a month on subscription. You'd most likely…</legend>
+            <div class="chips">
+              <label class="chip"><input type="radio" name="pods" value="subscribe"><span>Subscribe</span></label>
+              <label class="chip"><input type="radio" name="pods" value="as-needed"><span>Buy when I run out</span></label>
+              <label class="chip"><input type="radio" name="pods" value="bulk"><span>Buy a 6-month pack</span></label>
+              <label class="chip"><input type="radio" name="pods" value="too-much"><span>That's too much</span></label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="q" data-q="5" hidden>
+          <div class="field">
+            <label for="wish">What would make Osso an easy yes for you?</label>
+            <textarea id="wish" maxlength="1000" placeholder="A price, a finish, a guarantee, proof it works…"></textarea>
+          </div>
+          <fieldset class="field" style="margin-top:22px">
+            <legend>Could we call you for a 20-minute chat?</legend>
+            <p class="hint">We'll send a $25 gift card as a thank-you.</p>
+            <div class="chips">
+              <label class="chip"><input type="radio" name="interview" value="yes"><span>Yes, happy to</span></label>
+              <label class="chip"><input type="radio" name="interview" value="no"><span>Not right now</span></label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="row between">
+          <button class="btn-text" type="button" id="back">Back</button>
+          <button class="btn btn-ink" type="submit" id="next">Next</button>
+        </div>
+        <p class="msg" id="survey-msg"></p>
+      </div>
+    </form>
+
+    <!-- Step: done -->
+    <div id="s-done" hidden>
+      <div class="field" style="gap:18px">
+        <div class="done-mark" aria-hidden="true">✓</div>
+        <h2>Thank you. <em>Osso helpful.</em></h2>
+        <p class="muted" id="done-copy">You're on the list. We read every answer, and yours will shape what we build.</p>
+        <p class="fine">Know someone who'd want softer water? Share this page.</p>
+        <div class="row"><button class="btn-text" type="button" id="edit">Change my answers</button></div>
+      </div>
+    </div>
+
+    <!-- Step: joined, survey offer -->
+    <div id="s-joined" hidden>
+      <div class="field" style="gap:18px">
+        <div class="done-mark" aria-hidden="true">✓</div>
+        <h2>You're on the list. <em>One more thing?</em></h2>
+        <p class="muted">Five quick questions help us get the price, pods and fit right for you. About 90 seconds.</p>
+        <div class="row">
+          <button class="btn btn-ink" type="button" id="to-survey-2">Answer 5 questions</button>
+          <button class="btn-text" type="button" id="skip">Maybe later</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Owner-only results -->
+<section class="results" id="results" hidden>
+  <div class="wrap">
+    <div class="r-head">
+      <div>
+        <p class="eyebrow">Only you can see this</p>
+        <h2>Waitlist results</h2>
+      </div>
+      <p class="fine" id="r-updated">Live</p>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><span class="v" id="k-total">0</span><span class="k mono">Signups</span></div>
+      <div class="kpi"><span class="v" id="k-reserve">0%</span><span class="k mono">Clicked reserve ($129)</span></div>
+      <div class="kpi"><span class="v" id="k-complete">0%</span><span class="k mono">Finished survey</span></div>
+      <div class="kpi"><span class="v" id="k-renters">0%</span><span class="k mono">Renters</span></div>
+      <div class="kpi"><span class="v" id="k-bother">–</span><span class="k mono">Avg. bother (1–5)</span></div>
+    </div>
+    <div class="r-grid" id="r-grid"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap row between">
+    <p class="wordmark" style="font-size:20px">osso</p>
+    <p class="fine" style="margin:0">Osso is in development. Nothing is charged when you reserve.</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+  // Optional: when hosted outside claude.ai, set this to a form endpoint
+  // (Formspree, a Google Apps Script web app, etc.) that accepts a JSON POST.
+  const ENDPOINT = "";
+
+  /* ---------- Headline A/B: open the page with #b for variant B ---------- */
+  const VARIANTS = {
+    a: { h: 'Soft water. <em>No landlord required.</em>' },
+    b: { h: 'It isn\'t your shampoo. <em>It\'s your water.</em>' },
+  };
+  const variant = location.hash.replace("#", "").toLowerCase() === "b" ? "b" : "a";
+  $("#headline").innerHTML = VARIANTS[variant].h;
+
+  /* ---------- Storage ---------- */
+  let db = null, uid = null, user = null;
+  const local = {
+    get() { try { return JSON.parse(localStorage.getItem("osso-waitlist") || "null"); } catch { return null; } },
+    set(v) { try { localStorage.setItem("osso-waitlist", JSON.stringify(v)); } catch { /* unavailable */ } },
+  };
+  let record = local.get() || { variant };
+  let canSave = !!ENDPOINT;
+
+  async function save(patch) {
+    Object.assign(record, patch, { updatedAt: new Date().toISOString() });
+    local.set(record);
+    if (db && uid) {
+      try {
+        await db.doc("responses/" + uid).set(record);
+        return true;
+      } catch (e) {
+        if (e && e.code === "invalid_argument") showNoStore();
+        return false;
+      }
+    }
+    if (ENDPOINT) {
+      try {
+        await fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(record) });
+        return true;
+      } catch { return false; }
+    }
+    return false;
+  }
+  function showNoStore() {
+    canSave = false;
+    const n = $("#store-notice");
+    n.textContent = window.claude
+      ? "Responses can't be saved in this view. Open the page signed in to claude.ai with Contributor access to take part."
+      : "Test mode: responses are only kept in this browser. Set ENDPOINT in landing.html to collect them.";
+    n.hidden = false;
+  }
+
+  /* ---------- Steps ---------- */
+  const panes = ["s-join", "s-reserved", "s-joined", "s-survey", "s-done"];
+  function show(id) { panes.forEach((p) => { $("#" + p).hidden = p !== id; }); }
+
+  const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  function readJoin() {
+    const email = $("#email").value.trim();
+    const home = ($('input[name="home"]:checked') || {}).value || null;
+    return { email, home };
+  }
+
+  $("#s-join").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const { email, home } = readJoin();
+    const msg = $("#join-msg");
+    if (!emailOk(email)) { msg.className = "msg err"; msg.textContent = "Enter an email address like name@example.com."; $("#email").focus(); return; }
+    msg.className = "msg"; msg.textContent = "";
+    await save({ email, home, joinedAt: record.joinedAt || new Date().toISOString() });
+    show("s-joined");
+  });
+
+  $("#reserve").addEventListener("click", async () => {
+    const { email, home } = readJoin();
+    const msg = $("#join-msg");
+    record.reserveClicked = true; // count the click even before an email
+    if (!emailOk(email)) {
+      await save({ reserveClicked: true, reserveClickedAt: new Date().toISOString() });
+      msg.className = "msg err"; msg.textContent = "Add your email above so we can hold your spot.";
+      $("#email").focus();
+      return;
+    }
+    await save({ email, home, reserveClicked: true, reserved: true, reserveClickedAt: record.reserveClickedAt || new Date().toISOString(), joinedAt: record.joinedAt || new Date().toISOString() });
+    show("s-reserved");
+  });
+
+  /* ---------- Survey ---------- */
+  let q = 1;
+  const Q = 5;
+  let showers = 7;
+  const survey = () => ({
+    bother: +(($('input[name="bother"]:checked') || {}).value || 0) || null,
+    pains: $$('input[name="pains"]:checked').map((i) => i.value),
+    tried: $$('input[name="tried"]:checked').map((i) => i.value),
+    spend: ($('input[name="spend"]:checked') || {}).value || null,
+    showers,
+    zip: $("#zip").value.trim() || null,
+    price: ($('input[name="price"]:checked') || {}).value || null,
+    pods: ($('input[name="pods"]:checked') || {}).value || null,
+    wish: $("#wish").value.trim().slice(0, 1000) || null,
+    interview: ($('input[name="interview"]:checked') || {}).value || null,
+  });
+
+  function renderQ() {
+    $$("#s-survey .q").forEach((el) => { el.hidden = +el.dataset.q !== q; });
+    $$(".progress span").forEach((s, i) => s.classList.toggle("on", i < q));
+    $("#step-label").textContent = `Question ${q} of ${Q}`;
+    $("#back").style.visibility = q === 1 ? "hidden" : "visible";
+    $("#next").textContent = q === Q ? "Send my answers" : "Next";
+    $("#survey-msg").textContent = "";
+  }
+  function startSurvey() { q = 1; renderQ(); show("s-survey"); }
+  $("#to-survey-1").addEventListener("click", startSurvey);
+  $("#to-survey-2").addEventListener("click", startSurvey);
+  $("#skip").addEventListener("click", () => { $("#done-copy").textContent = "You're on the list. We'll email you before launch."; show("s-done"); });
+  $("#edit").addEventListener("click", startSurvey);
+  $("#back").addEventListener("click", () => { if (q > 1) { q--; renderQ(); } });
+
+  $("#s-survey").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const s = survey();
+    const msg = $("#survey-msg");
+    if (q === 1 && !s.bother) { msg.className = "msg err"; msg.textContent = "Pick a number from 1 to 5 to continue."; return; }
+    if (q === 3 && s.zip && !/^\d{5}$/.test(s.zip)) { msg.className = "msg err"; msg.textContent = "Enter a 5-digit ZIP code, or leave it blank."; return; }
+    if (q < Q) {
+      await save({ survey: s, lastStep: q }); // keep partial answers for drop-off analysis
+      q++; renderQ(); return;
+    }
+    await save({ survey: s, lastStep: Q, completedAt: new Date().toISOString() });
+    $("#done-copy").textContent = "You're on the list. We read every answer, and yours will shape what we build.";
+    show("s-done");
+  });
+
+  $$(".stepper button").forEach((b) => b.addEventListener("click", () => {
+    showers = Math.min(42, Math.max(1, showers + +b.dataset.step));
+    $("#showers-out").textContent = showers;
+  }));
+  $("#zip").addEventListener("input", (e) => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 5); });
+
+  /* ---------- Restore a returning visitor ---------- */
+  function restore(r) {
+    if (!r) return;
+    if (r.email) $("#email").value = r.email;
+    if (r.home) { const el = $(`input[name="home"][value="${r.home}"]`); if (el) el.checked = true; }
+    const s = r.survey || {};
+    const check = (name, v) => { const el = $(`input[name="${name}"][value="${CSS.escape(String(v))}"]`); if (el) el.checked = true; };
+    ["bother", "spend", "price", "pods", "interview"].forEach((k) => s[k] != null && check(k, s[k]));
+    ["pains", "tried"].forEach((k) => (s[k] || []).forEach((v) => check(k, v)));
+    if (s.showers) { showers = s.showers; $("#showers-out").textContent = showers; }
+    if (s.zip) $("#zip").value = s.zip;
+    if (s.wish) $("#wish").value = s.wish;
+    if (r.completedAt) show("s-done");
+    else if (r.email) show("s-joined");
+  }
+  restore(record);
+
+  /* ---------- Owner results ---------- */
+  const LABELS = {
+    home: { rent: "Rent", own: "Own", other: "Something else" },
+    pains: { hair: "Dull or dry hair", color: "Hair color fading", skin: "Dry or itchy skin", glass: "Spots on glass", scale: "Scale on fixtures", chlorine: "Chlorine smell", unsure: "Not sure it's hard" },
+    tried: { filterhead: "Filter showerhead", clarifying: "Clarifying shampoo", treatments: "Hair or skin treatments", cleaners: "Descalers and cleaners", wholehome: "Whole-home softener", nothing: "Nothing yet" },
+    spend: { "0": "$0", "1-15": "Under $15", "15-40": "$15–$40", "40+": "More than $40" },
+    price: { "<79": "Under $79", "79-99": "$79–$99", "99-129": "$99–$129", "129-159": "$129–$159", "159+": "$159+" },
+    pods: { subscribe: "Subscribe", "as-needed": "Buy when out", bulk: "6-month pack", "too-much": "Too much" },
+  };
+  const pct = (n, d) => (d ? Math.round((n / d) * 100) + "%" : "–");
+  const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  function tally(rows, pick, labels, title, base) {
+    const counts = {};
+    Object.keys(labels).forEach((k) => (counts[k] = 0));
+    rows.forEach((r) => { const v = pick(r); (Array.isArray(v) ? v : v != null ? [v] : []).forEach((x) => { if (x in counts) counts[x]++; }); });
+    const denom = base ?? rows.filter((r) => { const v = pick(r); return Array.isArray(v) ? v.length : v != null; }).length;
+    const body = Object.entries(counts).sort((a, b) => b[1] - a[1])
+      .map(([k, n]) => `<tr><td>${esc(labels[k])}</td><td><b>${pct(n, denom)}</b>${n}</td></tr>`).join("");
+    return `<div class="tally"><h3>${esc(title)} · n=${denom}</h3><table>${body}</table></div>`;
+  }
+
+  function renderResults(rows) {
+    const signups = rows.filter((r) => r.email);
+    const done = rows.filter((r) => r.completedAt);
+    const visitors = rows.length;
+    $("#k-total").textContent = signups.length;
+    $("#k-reserve").textContent = pct(rows.filter((r) => r.reserveClicked).length, visitors);
+    $("#k-complete").textContent = pct(done.length, signups.length);
+    $("#k-renters").textContent = pct(signups.filter((r) => r.home === "rent").length, signups.filter((r) => r.home).length);
+    const b = rows.map((r) => r.survey && r.survey.bother).filter(Boolean);
+    $("#k-bother").textContent = b.length ? (b.reduce((a, c) => a + c, 0) / b.length).toFixed(1) : "–";
+
+    const byVar = ["a", "b"].map((v) => {
+      const vr = rows.filter((r) => (r.variant || "a") === v);
+      return { v, n: vr.length, signup: vr.filter((r) => r.email).length, reserve: vr.filter((r) => r.reserveClicked).length };
+    });
+    const varTable = `<div class="tally"><h3>Headline test · visitors who acted</h3><table>
+      ${byVar.map((x) => `<tr><td>${x.v.toUpperCase()}: ${x.v === "a" ? "No landlord required" : "It's your water"}</td><td><b>${pct(x.reserve, x.n)}</b>reserve · ${x.signup}/${x.n} signups</td></tr>`).join("")}
+    </table></div>`;
+
+    const S = (r) => r.survey || {};
+    const drop = [1, 2, 3, 4, 5].map((n) => signups.filter((r) => (r.lastStep || 0) >= n).length);
+    const dropTable = `<div class="tally"><h3>Survey drop-off · of ${signups.length} signups</h3><table>
+      ${drop.map((n, i) => `<tr><td>Answered question ${i + 1}</td><td><b>${pct(n, signups.length)}</b>${n}</td></tr>`).join("")}</table></div>`;
+
+    const people = signups.slice().sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+    const peopleTable = `<div class="tally wide"><h3>People · ${people.length}</h3><div class="table-scroll"><table class="people">
+      <thead><tr><th>Email</th><th>Home</th><th>Reserved</th><th>Price</th><th>Interview</th><th>What would make it an easy yes</th></tr></thead><tbody>
+      ${people.map((r) => `<tr><td>${esc(r.email)}</td><td>${esc(LABELS.home[r.home] || "–")}</td><td>${r.reserved ? "Yes" : "–"}</td><td>${esc(LABELS.price[S(r).price] || "–")}</td><td>${S(r).interview === "yes" ? "Yes" : "–"}</td><td class="q">${esc(S(r).wish || "")}</td></tr>`).join("") || '<tr><td colspan="6" class="muted">No signups yet. Share the page link with testers to start collecting.</td></tr>'}
+      </tbody></table></div></div>`;
+
+    $("#r-grid").innerHTML =
+      varTable + dropTable +
+      tally(rows, (r) => S(r).price, LABELS.price, "Kit price that feels right") +
+      tally(rows, (r) => S(r).pods, LABELS.pods, "Pods at $12 / month") +
+      tally(rows, (r) => S(r).pains, LABELS.pains, "What they notice", rows.filter((r) => (S(r).pains || []).length).length) +
+      tally(rows, (r) => S(r).tried, LABELS.tried, "What they've tried", rows.filter((r) => (S(r).tried || []).length).length) +
+      tally(rows, (r) => S(r).spend, LABELS.spend, "Monthly spend on fixes") +
+      tally(signups, (r) => r.home, LABELS.home, "Rent or own") +
+      `<div class="tally"><h3>Interview opt-ins</h3><table><tr><td>Said yes to a call</td><td><b>${rows.filter((r) => S(r).interview === "yes").length}</b></td></tr></table></div>` +
+      peopleTable;
+    $("#r-updated").textContent = "Live · updated " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }
+
+  /* ---------- Connect to the artifact's shared store when available ---------- */
+  (async () => {
+    if (!window.claude || typeof window.claude.use !== "function") {
+      if (!ENDPOINT) showNoStore();
+      return;
+    }
+    const [d, u] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    db = d; user = u;
+    if (!db || !user) { if (!ENDPOINT) showNoStore(); return; }
+    uid = await user.id();
+    if (!uid) { if (!ENDPOINT) showNoStore(); return; }
+    canSave = true;
+
+    try {
+      const mine = await db.doc("responses/" + uid).get();
+      if (mine.exists) { record = Object.assign({}, mine.data()); restore(record); }
+    } catch { /* keep local state */ }
+
+    if (await user.isOwner()) {
+      $("#results").hidden = false;
+      db.collection("responses").onSnapshot(
+        (snap) => renderResults(snap.docs.map((doc) => doc.data())),
+        () => { $("#r-updated").textContent = "Couldn't load results. Reload the page to try again."; }
+      );
+    }
+  })();
+})();
+</script>
+</body>
+</html>
